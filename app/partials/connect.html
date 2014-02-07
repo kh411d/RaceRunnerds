@@ -1,0 +1,17 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+	    <button type="button" class="btn btn-primary btn-large" ng-show="!logged" ng-disabled="!facebookReady" ng-click="IntentLogin()">Facebook Connect</button>
+	    <button type="button" class="btn btn-primary btn-large" ng-show="logged" ng-disabled="!facebookReady" ng-click="logout()"> Facebook Logout</button>
+	</div>
+	<div class="span12">
+            <debug val="user"></debug>
+          </div>
+  </div>
+</div>
+
+
+
+
+
+          

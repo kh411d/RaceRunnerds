@@ -1,0 +1,22 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+    <div>
+      <p>Finding your {{ user.id }} location: <span id="status">checking...</span></p>
+    </div>
+    <div id="mapcanvas" class="span12" style="height:300px"></div>
+     <div class="span12 text-center"><h1>{{ stopwatch.text }}</h1></div>
+     <div class="span12" align="center">
+     	<button class="btn btn-block btn-success btn-large" ng-click='start()'>START</button>
+     </div>
+     <div class="span12" style="margin-top:20px;" align="center">
+		<button class="btn  btn-large btn-warning" style="width:30%;" ng-click='stop()'><i class="glyphicon glyphicon-pause"></i></button>
+     	<button class="btn  btn-large btn-info" style="width:30%;" ng-click='lap()'><i class="glyphicon glyphicon-flag"></i></button>
+     	<button class="btn  btn-large btn-danger" style="width:30%;" ng-click='reset()'><i class="glyphicon glyphicon-refresh"></i></button>
+     </div>
+     <div class="span12" style="margin-top:20px;" align="center">
+		<button class="btn btn-block btn-success btn-large" ng-click='end()'>FINISH</button>
+     </div>
+</div>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+  	<div class="span12">
+		How to:
+		<ol>
+			<li>Search your pulse with your left hand (on the neck it's the easier).</li>
+			<li>When you fell a pulse, press START</li>
+			<li>Count 10 pulses</li>
+			<li>At 10th pulse, press STOP. The heart rate is calculated and displayed.</li>
+		</ol>
+	</div>
+  	<div class="jumbotron" align="center">
+  		<h1>{{ bpm }} Bpm</h1>
+	</div>
+    <div class="span12">
+   		<button type="button" ng-show="!counting" ng-click="start()" class="btn btn-primary btn-lg btn-block">START</button>
+		<button type="button" ng-show="counting" ng-click="stop()" class="btn btn-primary btn-lg btn-block">STOP</button>
+	</div>
+  </div>
+</div>
+
+
+
+
+
+          

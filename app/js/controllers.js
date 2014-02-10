@@ -4,6 +4,182 @@
 
 var runnerdControllers = angular.module('runnerdControllers',[]);
 
+runnerdControllers.controller('HeartrateCtrl',['$scope','$timeout',function($scope,$timeout){
+  //Set Stopwatch
+    var data = { 
+            value: 0,
+            bpm: 0
+        },
+    	stopwatch = null;
+    $scope.counting = false;	
+        
+    $scope.start = function () {
+    	$scope.counting = true;
+    	$scope.bpm = 0;
+		stopwatch = $timeout(function() {
+            data.value++;	
+            $scope.start();
+
+        }, 1000);
+    };
+
+    $scope.stop = function () {
+    	$scope.counting = false;
+    	data.bpm = Math.floor((10/(data.value))*60);
+
+        $timeout.cancel(stopwatch);
+
+        stopwatch = null;
+        $scope.bpm = data.bpm;
+    };
+
+    $scope.bpm = data.bpm;
+
+}]);
+
+runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
+
+//Getting TrackPoint from GPX file
+    var points = [];
+    var marker = [];
+    var simulator = [];
+    var bounds = new google.maps.LatLngBounds ();
+    var map;
+    var eol;
+    var poly;
+
+
+
+    $http.get('contents/track.gpx').success(function(data) {   	
+		$(data).find("trkpt").each(function() {
+		  var lat = $(this).attr("lat");
+		  var lon = $(this).attr("lon");
+		  var p = new google.maps.LatLng(lat, lon);
+		  points.push(p);
+		  bounds.extend(p);       	 
+		});
+
+
+		var latlng = points[0];
+   		 
+			  var start_latlng = points[0];
+			  var finish_latlng = points[points.length - 1];
+
+	    var myOptions = {
+				    zoom: 15,
+				    center: latlng,
+				    mapTypeControl: false,
+				    navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+				    mapTypeId: google.maps.MapTypeId.ROADMAP
+				  };
+
+				  map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
+
+				  //Track point
+				   poly = new google.maps.Polyline({
+							  path: points,
+							  strokeColor: "#FF00AA",
+							  strokeOpacity: .7,
+							  strokeWeight: 4
+							});
+							
+				   poly.setMap(map);
+
+				   eol = poly.Distance();
+
+					// fit bounds to track
+					map.fitBounds(bounds);
+
+		marker[1] = new google.maps.Marker({
+				      position: points[0], 
+				      map: map, 
+				      title:"u1"
+		});
+
+
+    }); 
+
+	function animate(d,marker,tick) {
+			  	if (d>eol) {
+		          return;
+		        }
+		        var p = poly.GetPointAtDistance(d);
+		        marker.setPosition(p);
+		        d = d + 10;
+		        $timeout(function() {
+	              animate(d,marker,tick);
+	            }, tick)
+	}	
+
+	function sortAssoc(aInput)
+	{
+	var aTemp = [];
+	for (var sKey in aInput)
+	aTemp.push([sKey, aInput[sKey]]);
+	aTemp.sort(function () {return arguments[0][1] < arguments[1][1]});
+
+	var aOutput = [];
+	for (var nIndex = aTemp.length-1; nIndex >=0; nIndex--)
+	aOutput[aTemp[nIndex][0]] = aTemp[nIndex][1];
+
+	return aOutput;
+	}		
+
+	
+	$scope.simulate = function(){
+
+		var runners = new Array();
+		var sorted = [];
+
+		runners['f1'] = { 'val' : $('#f1').val() || 0 };
+		runners['f2'] = { 'val' : $('#f2').val() || 0 };
+		runners['f0'] = { 'val' : 3600 };
+
+		Object.keys( runners ).sort(function( a, b ) {
+		    return runners[a].val - runners[b].val;
+		}).forEach(function( key ) { 
+		    sorted.push(key);
+		});
+
+		console.dir(sorted);
+		
+		var fastest = sorted[0];
+		var dividen = sorted[0]/100;
+		
+
+
+		return;
+
+		animate(0,marker[1],100);
+
+		if(f1 > 0){
+			marker[2] = new google.maps.Marker({
+				      position: points[0], 
+				      map: map, 
+				      title:"u2"
+			});
+			animate(0,marker[2],225);
+		}
+
+		if(f2 > 0){
+			marker[3] = new google.maps.Marker({
+				      position: points[0], 
+				      map: map, 
+				      title:"u3"
+			});
+			animate(0,marker[3],300);	
+		}
+		
+		
+	}
+
+}]);
+
+runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
+
+
+}]);
+
 runnerdControllers.controller('ConnectCtrl', ['$scope', 'Facebook','$timeout', function($scope, Facebook,$timeout) {
 
 // Define user empty data :/
@@ -108,7 +284,7 @@ runnerdControllers.controller('ConnectCtrl', ['$scope', 'Facebook','$timeout', f
 
 }]);
 
-runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService','$timeout','cfg_coords','Facebook',function($scope,$http,localStorageService,$timeout,cfg_coords,Facebook){
+runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
    
     //Getting page content
     $http.get('contents/start.json').success(function(data) {
@@ -282,7 +458,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
     //Getting TrackPoint from GPX file
     var points = [];
     var bounds = new google.maps.LatLngBounds ();
-		
+
     $http.get('contents/track.gpx').success(function(data) {   	
 		$(data).find("trkpt").each(function() {
 		  var lat = $(this).attr("lat");
@@ -303,17 +479,19 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 		  	function(position) {
 			  
 			  var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-			  
-			  var start_latlng = new google.maps.LatLng(cfg_coords.start.lat, cfg_coords.start.lng);
-			  var finish_latlng = new google.maps.LatLng(cfg_coords.finish.lat, cfg_coords.finish.lng);
+			 
+			  var start_latlng = points[0];
+			  var finish_latlng = points[points.length - 1];
 
 			  //Check distance position with start and race coordinates
 			  var distance_to_start = Math.round(google.maps.geometry.spherical.computeDistanceBetween(latlng, start_latlng));
 			  var distance_to_finish = Math.round(google.maps.geometry.spherical.computeDistanceBetween(latlng, finish_latlng));
 
+			  var distance_to_start_text = distance_to_start > 1000 ? Math.floor(distance_to_start/1000)+"km" : distance_to_start+"m";
+			  var distance_to_finish_text = distance_to_finish > 1000 ? Math.floor(distance_to_finish/1000)+"km" : distance_to_finish+"m";
 			 
 			  var s = document.querySelector('#status');
-			  s.innerHTML = "You are <b>"+distance_to_start+"m</b> from START point and <b>"+distance_to_finish+"m</b> from FINISH point";
+			  s.innerHTML = "You are apprx. <b>"+distance_to_start_text+"</b> from START point and <b>"+distance_to_finish_text+"</b> from FINISH point";
 			  
 			  
 			  var myOptions = {
@@ -323,8 +501,6 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 			    navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
 			    mapTypeId: google.maps.MapTypeId.ROADMAP
 			  };
-
-			  
 
 			  var map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
 
@@ -337,10 +513,12 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 						});
 						
 				  poly.setMap(map);
-						
+
+			  var eol = poly.Distance();
+
 				// fit bounds to track
 				map.fitBounds(bounds);
-			  
+
 			  var marker = new google.maps.Marker({
 			      position: latlng, 
 			      map: map, 
@@ -358,6 +536,24 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 			      map: map, 
 			      title:"FINISH POINT!"
 			  });
+
+
+			  $scope.animate = function(d) {
+
+			  	if (d>eol) {
+		          return;
+		        }
+		        var p = poly.GetPointAtDistance(d);
+		        
+		        map.panTo(p);
+		        
+		        start_marker.setPosition(p);
+		        d = d + 10;
+		        $timeout(function() {
+	              $scope.animate(d);
+	            }, 100)
+		      }
+
 			}, 
 
 			function (error) {

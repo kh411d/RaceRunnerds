@@ -41,7 +41,7 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 
 //Getting TrackPoint from GPX file
     var points = [];
-    var marker = [];
+    var marker;
     var simulator = [];
     var bounds = new google.maps.LatLngBounds ();
     var map;
@@ -90,10 +90,10 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 					// fit bounds to track
 					map.fitBounds(bounds);
 
-		marker[1] = new google.maps.Marker({
+		marker = new google.maps.Marker({
 				      position: points[0], 
 				      map: map, 
-				      title:"u1"
+				      title:"f0"
 		});
 
 
@@ -110,67 +110,37 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 	              animate(d,marker,tick);
 	            }, tick)
 	}	
-
-	function sortAssoc(aInput)
-	{
-	var aTemp = [];
-	for (var sKey in aInput)
-	aTemp.push([sKey, aInput[sKey]]);
-	aTemp.sort(function () {return arguments[0][1] < arguments[1][1]});
-
-	var aOutput = [];
-	for (var nIndex = aTemp.length-1; nIndex >=0; nIndex--)
-	aOutput[aTemp[nIndex][0]] = aTemp[nIndex][1];
-
-	return aOutput;
-	}		
-
 	
 	$scope.simulate = function(){
 
+		var max_runners = 3;
 		var runners = new Array();
 		var sorted = [];
+		runners['f0'] = { 'val' : 3600, 'marker' : marker };
 
-		runners['f1'] = { 'val' : $('#f1').val() || 0 };
-		runners['f2'] = { 'val' : $('#f2').val() || 0 };
-		runners['f0'] = { 'val' : 3600 };
-
+		for (var i = 1; i <= max_runners; i++){
+			if($('#f'+i).val()){
+				runners['f'+i] = { 'val' : $('#f'+i).val(),
+								  'marker' : new google.maps.Marker({
+										      position: points[0], 
+										      map: map, 
+										      title:"f"+i})
+								};
+			}
+		}
+		
+		
 		Object.keys( runners ).sort(function( a, b ) {
 		    return runners[a].val - runners[b].val;
 		}).forEach(function( key ) { 
 		    sorted.push(key);
 		});
 
-		console.dir(sorted);
-		
-		var fastest = sorted[0];
-		var dividen = sorted[0]/100;
-		
+		var dividen = Math.floor(runners[sorted[0]].val/100);
 
-
-		return;
-
-		animate(0,marker[1],100);
-
-		if(f1 > 0){
-			marker[2] = new google.maps.Marker({
-				      position: points[0], 
-				      map: map, 
-				      title:"u2"
-			});
-			animate(0,marker[2],225);
-		}
-
-		if(f2 > 0){
-			marker[3] = new google.maps.Marker({
-				      position: points[0], 
-				      map: map, 
-				      title:"u3"
-			});
-			animate(0,marker[3],300);	
-		}
-		
-		
+		for (var runner in runners) {
+			animate(0,runners[runner].marker,Math.floor(runners[runner].val/dividen));
+		}	
 	}
 
 }]);

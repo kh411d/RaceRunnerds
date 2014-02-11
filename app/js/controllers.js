@@ -47,7 +47,8 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
     var map;
     var eol;
     var poly;
-
+    
+    $scope.is_animate = false;
 
 
     $http.get('contents/track.gpx').success(function(data) {   	
@@ -73,34 +74,29 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 				    mapTypeId: google.maps.MapTypeId.ROADMAP
 				  };
 
-				  map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
+	  	map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
 
-				  //Track point
-				   poly = new google.maps.Polyline({
-							  path: points,
-							  strokeColor: "#FF00AA",
-							  strokeOpacity: .7,
-							  strokeWeight: 4
-							});
-							
-				   poly.setMap(map);
+	  	//Track point
+	   poly = new google.maps.Polyline({
+				  path: points,
+				  strokeColor: "#FF00AA",
+				  strokeOpacity: .7,
+				  strokeWeight: 4
+				});
+				
+	   poly.setMap(map);
 
-				   eol = poly.Distance();
+	   eol = poly.Distance();
 
-					// fit bounds to track
-					map.fitBounds(bounds);
-
-		marker = new google.maps.Marker({
-				      position: points[0], 
-				      map: map, 
-				      title:"f0"
-		});
+		// fit bounds to track
+		map.fitBounds(bounds);
 
 
     }); 
 
 	function animate(d,marker,tick) {
-			  	if (d>eol) {
+			  	if (d>eol || !$scope.is_animate) {
+			  		marker.setMap(null);
 		          return;
 		        }
 		        var p = poly.GetPointAtDistance(d);
@@ -109,44 +105,157 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 		        $timeout(function() {
 	              animate(d,marker,tick);
 	            }, tick)
+	}
+
+	$scope.stop = function(){
+		$scope.is_animate = false;
 	}	
 	
 	$scope.simulate = function(){
-
-		var max_runners = 3;
+		
+		var max_runners = 2;
 		var runners = new Array();
-		var sorted = [];
-		runners['f0'] = { 'val' : 3600, 'marker' : marker };
+		var temp = [];
+		$scope.is_animate = false;
+		
+		marker = new google.maps.Marker({
+										      position: points[0], 
+										      map: map, 
+										      title:"f0",
+										      icon:"http://maps.google.com/mapfiles/marker.png"
+										});
+
+		runners['f0'] = { 'val' : 1300, 'marker' : marker };
+		var icon = [];
+		icon['f1'] = 'http://maps.google.com/mapfiles/marker_purple.png';
+		icon['f2'] = 'http://maps.google.com/mapfiles/marker_yellow.png'; 
 
 		for (var i = 1; i <= max_runners; i++){
 			if($('#f'+i).val()){
-				runners['f'+i] = { 'val' : $('#f'+i).val(),
-								  'marker' : new google.maps.Marker({
+				marker = new google.maps.Marker({
 										      position: points[0], 
 										      map: map, 
-										      title:"f"+i})
-								};
+										      title:"f"+i,
+										      icon : icon["f"+i]
+										  })
+				runners['f'+i] = { 
+								  'val' : $('#f'+i).val(),
+								  'marker' : marker
+								 };
 			}
 		}
 		
-		
+		//Sort runners to get Min val (in seconds)
 		Object.keys( runners ).sort(function( a, b ) {
 		    return runners[a].val - runners[b].val;
 		}).forEach(function( key ) { 
-		    sorted.push(key);
+		    temp.push(key);
 		});
+		//Get small time ratio for the fastest runner to 100 millisecs tick
+		var dividen = Math.floor(runners[temp[0]].val/100);
+		var animate_time=0;
 
-		var dividen = Math.floor(runners[sorted[0]].val/100);
-
+		$scope.is_animate = true;
 		for (var runner in runners) {
-			animate(0,runners[runner].marker,Math.floor(runners[runner].val/dividen));
+			var tick = Math.floor((runners[runner].val/runners[temp[0]].val)*100);
+			animate_time = animate_time + tick;
+			animate(0,runners[runner].marker,tick);
 		}	
+		
+		
+		//Total animate time
+		/*$timeout(function() {
+	              $scope.is_animate = false;
+	            }, animate_time*50)*/
 	}
+
 
 }]);
 
 runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
 
+	var markersArray = [];
+
+	        //Try GeoLocation support
+	if (navigator.geolocation) {
+
+	  	navigator.geolocation.getCurrentPosition(
+
+
+		  	function(position) {
+			 
+			  var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				
+
+	            var myOptions = {
+			    zoom: 18,
+			    center: latlng,
+			    mapTypeControl: false,
+			    navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+			    mapTypeId: google.maps.MapTypeId.ROADMAP
+			  };
+
+			  var map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
+
+	            // add a click event handler to the map object
+	            google.maps.event.addListener(map, "click", function(event)
+	            {
+	                // place a marker
+	                placeMarker(event.latLng);
+	            });
+
+	            placeMarker(latlng);
+
+	            function placeMarker(location) {
+		            // first remove all markers if there are any
+		            deleteOverlays();
+
+		            var marker = new google.maps.Marker({
+		                position: location, 
+		                map: map
+		            });
+
+		            // add marker in markers array
+		            markersArray.push(marker);
+
+		            map.setCenter(location);
+		            $('#status').html("<textarea class='form-control' rows='3'>Hi! Please check our meet point at https://maps.google.com/maps?saddr="+location.lat()+","+location.lng()+"</textarea>");
+		            
+		        }
+
+		        // Deletes all markers in the array by removing references to them
+		        function deleteOverlays() {
+		            if (markersArray) {
+		                for (var i in markersArray) {
+		                    markersArray[i].setMap(null);
+		                }
+		            markersArray.length = 0;
+		            }
+		        }
+
+			}, 
+
+			function (error) {
+			  var s = document.querySelector('#status');
+ 			    switch (error.code) {
+	              	case 1:
+	             	 s.innerHTML = 'You have rejected access to your location';             
+	                break;
+	              	case 2:
+	                s.innerHTML = 'Unable to determine your location';
+	                break;
+	              	case 3:
+	                s.innerHTML = 'Service timeout has been reached';
+	                break;
+	            }
+			}
+		);
+
+	} else {
+	  var s = document.querySelector('#status');
+	  s.innerHTML = 'Browser does not support location services';
+	}
+	       
 
 }]);
 
@@ -511,6 +620,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 			  $scope.animate = function(d) {
 
 			  	if (d>eol) {
+			  	  start_marker.setPosition(start_latlng);
 		          return;
 		        }
 		        var p = poly.GetPointAtDistance(d);

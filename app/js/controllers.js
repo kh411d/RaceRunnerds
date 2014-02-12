@@ -12,6 +12,27 @@ runnerdControllers.controller('HeartrateCtrl',['$scope','$timeout',function($sco
         },
     	stopwatch = null;
     $scope.counting = false;	
+    $scope.showcounter = true;
+    $scope.showhowto = false;
+    $scope.showwiki = false;
+
+    $scope.toggle = function(item) {
+    	if(item == "counter"){
+			$scope.showcounter = true;
+    		$scope.showhowto = false;
+    		$scope.showwiki = false;
+    	}
+    	if(item == "howto"){
+    		$scope.showcounter = false;
+    		$scope.showhowto = true;
+    		$scope.showwiki = false;
+    	}
+    	if(item == "wiki"){
+    		$scope.showcounter = false;
+    		$scope.showhowto = false;
+    		$scope.showwiki = true;
+    	}
+    }
         
     $scope.start = function () {
     	$scope.counting = true;
@@ -25,12 +46,13 @@ runnerdControllers.controller('HeartrateCtrl',['$scope','$timeout',function($sco
 
     $scope.stop = function () {
     	$scope.counting = false;
-    	data.bpm = Math.floor((10/(data.value))*60);
+    	data.bpm = Math.floor((10/(data.value+1))*60);
 
         $timeout.cancel(stopwatch);
 
         stopwatch = null;
         $scope.bpm = data.bpm;
+        data.value = 0;
     };
 
     $scope.bpm = data.bpm;
@@ -175,6 +197,33 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
 
 	var markersArray = [];
+	//Getting TrackPoint from GPX file
+    var points = [];
+    var bounds = new google.maps.LatLngBounds ();
+
+    $http.get('contents/track.gpx').success(function(data) {   	
+		$(data).find("trkpt").each(function() {
+		  var lat = $(this).attr("lat");
+		  var lon = $(this).attr("lon");
+		  var p = new google.maps.LatLng(lat, lon);
+		  points.push(p);
+		  bounds.extend(p);
+		});
+    });
+
+    $scope.showhowto = false;
+    $scope.showmap = true;
+
+    $scope.toggle = function(item) {
+    	if(item == "map"){
+			$scope.showhowto = false;
+    		$scope.showmap = true;
+    	}
+    	if(item == "howto"){
+    		$scope.showhowto = true;
+    		$scope.showmap = false;
+    	}
+    }
 
 	        //Try GeoLocation support
 	if (navigator.geolocation) {
@@ -196,6 +245,22 @@ runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageSer
 			  };
 
 			  var map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
+
+			   //Track point
+			  var poly = new google.maps.Polyline({
+						  path: points,
+						  strokeColor: "#FF00AA",
+						  strokeOpacity: .7,
+						  strokeWeight: 4
+						});
+						
+				  poly.setMap(map);
+
+			  var eol = poly.Distance();
+
+				// fit bounds to track
+				map.fitBounds(bounds);
+
 
 	            // add a click event handler to the map object
 	            google.maps.event.addListener(map, "click", function(event)
@@ -219,7 +284,7 @@ runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageSer
 		            markersArray.push(marker);
 
 		            map.setCenter(location);
-		            $('#status').html("<textarea class='form-control' rows='3'>Hi! Please check our meet point at https://maps.google.com/maps?saddr="+location.lat()+","+location.lng()+"</textarea>");
+		            $('#status').html("<input type='text' class='topcoat-text-input--large full' value='Hi! Please check our meet point at https://maps.google.com/maps?saddr="+location.lat()+","+location.lng()+"'/>");
 		            
 		        }
 
@@ -365,10 +430,6 @@ runnerdControllers.controller('ConnectCtrl', ['$scope', 'Facebook','$timeout', f
 
 runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
    
-    //Getting page content
-    $http.get('contents/start.json').success(function(data) {
-      $scope.contents = data;
-    });
 
 	Facebook.getLoginStatus(function(response) {
       if(response.status == 'connected') {
@@ -380,6 +441,21 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 	  });
       }
     });
+
+    $scope.showmap = true;
+    $scope.showticker = false;
+    $scope.isrunning = false;
+
+    $scope.toggle = function(item){
+    	if(item == 'map'){
+    		$scope.showmap = true;
+    		$scope.showticker = false;
+    	}
+    	if(item == 'ticker'){
+    		$scope.showmap = false;
+    		$scope.showticker = true;
+    	}
+    };
 	  
     
     //Set Stopwatch
@@ -395,7 +471,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
         
     $scope.start = function () {
 
-    	if(!localStorageService.get('trackTime')){
+    	/*if(!localStorageService.get('trackTime')){
 	    	Facebook.getLoginStatus(function(response) {  
 			  Facebook.api(
 				    "/me/feed",
@@ -409,7 +485,6 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 					},
 				    function (response) {
 				      if (response && !response.error) {
-				        /* handle the result */
 				        alert('published');
 				      }else{
 				      	console.log(response);
@@ -420,13 +495,14 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
 
 			});
 
-    	}
+    	}*/
 
 
     	
     	localStorageService.remove('pauseAt');
 
     	localStorageService.add('isRunning',true);
+    	$scope.isrunning = true;
     	
 		stopwatch = $timeout(function() {
 
@@ -466,6 +542,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
         $timeout.cancel(stopwatch);
         stopwatch = null;
         localStorageService.add('isRunning',false);
+        $scope.isrunning = false;
         localStorageService.add('pauseAt',new Date());
     };
 
@@ -478,6 +555,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
         data.sec = 0;
         data.text = "00 : 00 : 00";
         data.laps = [];
+        $scope.isrunning = false;
         localStorageService.remove('pauseAt');
         localStorageService.remove('isRunning');
         localStorageService.remove('laps');
@@ -507,6 +585,7 @@ runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService',
     		"time" : (data.hour*3600)+(data.min*60)+(data.sec),
     	});
 
+    	$scope.isrunning = false;
     	localStorageService.remove('pauseAt');
         localStorageService.remove('isRunning');
         localStorageService.remove('laps');

@@ -1,26 +1,76 @@
-<div class="container-fluid">
-  <div class="row-fluid">
-  	<div class="span12">
-		How to:
-		<ol>
-			<li>Search your pulse with your left hand (on the neck it's the easier).</li>
-			<li>When you fell a pulse, press START</li>
-			<li>Count 10 pulses</li>
-			<li>At 10th pulse, press STOP. The heart rate is calculated and displayed.</li>
-		</ol>
-	</div>
-  	<div class="jumbotron" align="center">
-  		<h1>{{ bpm }} Bpm</h1>
-	</div>
-    <div class="span12">
-   		<button type="button" ng-show="!counting" ng-click="start()" class="btn btn-primary btn-lg btn-block">START</button>
-		<button type="button" ng-show="counting" ng-click="stop()" class="btn btn-primary btn-lg btn-block">STOP</button>
-	</div>
-  </div>
+<div class="topcoat-grid">
+	<div class="topcoat-grid__row">
+        <div class="topcoat-grid__column--auto">
+            <div class="topcoat-button-bar full">
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click="toggle('counter')">Counter</button>
+              </div>
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click="toggle('wiki')">Wiki</button>
+              </div>
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click="toggle('howto')">How To</button>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="topcoat-grid__row" ng-show="showcounter">
+        <div class="topcoat-grid__column--auto">
+           <button type="button" ng-show="!counting" ng-click="start()" class="topcoat-button--large full" style="height:300px;">
+           	<div style="font-size:30px;" align="center">
+		  		<h1>{{ bpm }} Bpm</h1>
+			</div>
+			<div>When you fell a pulse, press here.</div>
+           </button>
+		   <button type="button" ng-show="counting" ng-click="stop()" class="topcoat-button--large full" style="height:300px;">
+		   	Press here at 10th pulse.
+		   </button>
+        </div>          
+    </div>
+    <div class="topcoat-grid__row" ng-show="showhowto">
+        <div class="topcoat-grid__column--auto">
+	        <div class="well">
+		        How to:
+				<ol>
+					<li>Search your pulse with your index finger (on the neck it's the easier).</li>
+					<li>When you fell a pulse, press the button</li>
+					<li>Count 10 pulses</li>
+					<li>At 10th pulse, press the button again</li>
+					<li>The heart rate is calculated and displayed.</li>
+				</ol>
+				<img src="img/hrcycle.png" style="width:100%;margin-top:10px;"/>
+			</div>
+        </div>          
+    </div>
+
+    <div class="topcoat-grid__row" ng-show="showwiki">
+    	<div class="topcoat-grid__column--auto">
+			<div class="well">
+			<div id="hr50" style="margin-bottom:10px;">
+				<b>0-125 Bpm</b><br>
+				Rest Zone, its a normal heart rate before starting your excersise. 
+			</div>
+			<div id="hr5060" style="margin-bottom:10px;">
+				<b>125-136 Bpm</b><br>
+				Warm up zone is the least intense. You are in it just to warm up or cool down/recovery, in order to prevent injuries.
+			</div>
+			<div id="hr6070" style="margin-bottom:10px;">
+				<b>136-147 Bpm</b><br>
+				Endurance. Stay in this zone if your goal is to lose weight. You body is fueled by 10% carbohydrates, 5% protein and 85% fat. The actual number of calories burned per minute will be less than in higher zones, but you'll be able to maintain exercise longer.
+			</div>
+			<div id="hr7080" style="margin-bottom:10px;">
+				<b>147-158 Bpm</b><br>
+				Cardio/Stamina. Also called aerobic zone. In this zone you'll get the greatest health benefits overall. Your heart and lung capacity will increase and your overall fitness will also increase, so you'll be able to exercise longer. Your body will get 50% of your calories from fat, 50% from carbohydrates, and protein burn will be minimal.
+			</div>
+			<div id="hr8090" style="margin-bottom:10px;">
+				<b>158-169 Bpm</b><br>
+				Extreme. Also called anaerobic zone. This is a highly intense exercise and should be limited to no more than 10-20minutes. Your body's ability to consume oxygen will increase. If you push it too hard your body will start producing lactic acid. Your body will burn 85% carbohydrates, 15% fat, and minimal percentage of protein.
+			</div>
+			<div id="hr90" style="margin-bottom:10px;">
+				<b>169-180 Bpm</b><br>
+				Speed zone. You are pushing your heart to the limits here, and should consult your doctor to check if you can exercise in this zone safely.
+			</div>
+			</div>
+    	</div>
+    </div>
 </div>
-
-
-
-
-
-          

@@ -4,6 +4,12 @@
 
 var runnerdApp = angular.module('runnerdApp',['ngRoute','runnerdControllers','ngCookies','LocalStorageModule','facebook']);
   
+runnerdApp.run(function($rootScope,$location) {
+        $rootScope.go = function ( path ) {
+                          $location.path( path );
+                        };
+    });
+
 runnerdApp.config(['$routeProvider','FacebookProvider',function($routeProvider,FacebookProvider){
   $routeProvider.
     when('/run',{
@@ -52,17 +58,7 @@ runnerdApp.config(['$routeProvider','FacebookProvider',function($routeProvider,F
     FacebookProvider.init('275500175941247');
 }]);
 
-runnerdApp.factory('GpxService', function($http, $q) {
 
-    var getData = function() {
-        var deferred = $q.defer();
 
-        $http({method:"GET", url:"contents/track.gpx"}).success(function(result){
-            deferred.resolve(result);
-        });
-
-        return deferred.promise;
-    }
-});
 
 

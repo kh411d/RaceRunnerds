@@ -1,26 +1,19 @@
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12" style="margin-top:20px;" align="center">
-			<form class="form-inline" role="form">
-		  <div class="form-group">
-		    <input type="text" class="form-control" id="f1" value="1200" placeholder="1st Friend">
-		  </div>
-		 <div class="form-group">
-		    <input type="text" class="form-control" id="f2" value="1500" placeholder="2nd Friend">
-		  </div>
-		</form>
+<div class="topcoat-grid">
+    <div class="topcoat-grid__row">
+        <div class="topcoat-grid__column--auto">
+            <input type="text" class="topcoat-text-input" id="f1" value="1200" placeholder="1st Friend">
+                <input type="text" class="topcoat-text-input" id="f2" value="1500" placeholder="2nd Friend">
+        </div>
     </div>
-    <div class="span12" style="margin-top:20px;" align="center">
-
-		<button class="btn btn-block btn-large btn-info" ng-show="!is_animate" ng-click='simulate()'>START</button>
-		<button class="btn btn-block btn-large btn-info" ng-show="is_animate" ng-click='stop()'>STOP</button>
+    <div class="topcoat-grid__row">
+        <div class="topcoat-grid__column--auto">
+            <div id="mapcanvas" style="height:500px"></div>
+        </div>          
     </div>
-    <div id="mapcanvas" class="span12" style="height:300px"></div>
-	</div>
+    <div class="topcoat-grid__row">
+        <div class="topcoat-grid__column--auto">
+        	<button class="topcoat-button--large full" ng-show="!is_animate" ng-click='simulate()'>Go!</button>
+			<button class="topcoat-button--large full" ng-show="is_animate" ng-click='stop()'>Restart!</button>
+        </div>
+    </div>    
 </div>
-
-
-
-
-
-          

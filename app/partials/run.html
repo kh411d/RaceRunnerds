@@ -1,25 +1,37 @@
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
-    <div>
-      <p>Finding your {{ user.id }} location: <span id="status">checking...</span></p>
+<div class="topcoat-grid">
+    <div class="topcoat-grid__row">
+        <div class="topcoat-grid__column--auto">
+            <div class="topcoat-button-bar full">
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click="toggle('map')">Map</button>
+              </div>
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click="toggle('ticker')">Ticker</button>
+              </div>
+              <div class="topcoat-button-bar__item">
+                <button class="topcoat-button-bar__button--large full" ng-click='reset()'>Reset</button>
+              </div>
+            </div>
+        </div>
     </div>
-    <div class="span12" style="margin-top:20px;" align="center">
-		<button class="btn btn-block btn-large btn-info" ng-click='animate(0)'>Animate Track</button>
+    <div class="topcoat-grid__row" ng-show="showmap">
+        <div class="topcoat-grid__column--auto">
+            <p>Location: <span id="status">checking...</span></p>   
+            <div id="mapcanvas" style="height:500px"></div>
+            <button class="topcoat-button--large full" ng-click='animate(0)'>Animate Track</button>
+        </div>          
     </div>
-    <div id="mapcanvas" class="span12" style="height:300px"></div>
-     <div class="span12 text-center"><h1>{{ stopwatch.text }}</h1></div>
-     <div class="span12" align="center">
-     	<button class="btn btn-block btn-success btn-large" ng-click='start()'>START</button>
-     </div>
-     <div class="span12" style="margin-top:20px;" align="center">
-		<button class="btn  btn-large btn-warning" style="width:30%;" ng-click='stop()'><i class="glyphicon glyphicon-pause"></i></button>
-     	<button class="btn  btn-large btn-info" style="width:30%;" ng-click='lap()'><i class="glyphicon glyphicon-flag"></i></button>
-     	<button class="btn  btn-large btn-danger" style="width:30%;" ng-click='reset()'><i class="glyphicon glyphicon-refresh"></i></button>
-     </div>
-     <div class="span12" style="margin-top:20px;" align="center">
-		<button class="btn btn-block btn-success btn-large" ng-click='end()'>FINISH</button>
-     </div>
-</div>
-  </div>
+
+    <div class="topcoat-grid__row" ng-show="showticker">
+        <div class="topcoat-grid__column--auto" style="text-align:center;font-size:30px">
+            <h1>{{ stopwatch.text }}</h1>
+        </div>
+    </div>
+    <div class="topcoat-grid__row" ng-show="showticker">
+        <div class="topcoat-grid__column--auto">
+            <button class="topcoat-button--large full" style="height:300px;" ng-show="!isrunning" ng-click='start()'>START</button>
+            <button  class="topcoat-button--large three-quarters" style="height:300px;" ng-show="isrunning" ng-click='lap()'>LAP</button>
+            <button class="topcoat-button--large" style="height:300px;width:24%" ng-show="isrunning" ng-click='end()'>FINISH</button>
+        </div>
+    </div>    
 </div>

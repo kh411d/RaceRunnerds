@@ -1,5 +1,12 @@
 <div class="container-fluid">
   <div class="row-fluid">
+  	<div class="jumbotron" align="center">
+  		<h1>{{ bpm }} Bpm</h1>
+	</div>
+  	<div class="span12">
+   		<button type="button" ng-show="!counting" ng-click="start()" style="height:200px" class="btn btn-success btn-lg btn-block"><i class="glyphicon glyphicon-play"></i></button>
+		<button type="button" ng-show="counting" ng-click="stop()" style="height:200px" class="btn btn-danger btn-lg btn-block"><i class="glyphicon glyphicon-stop"></i></button>
+	</div>
   	<div class="span12">
 		How to:
 		<ol>
@@ -9,13 +16,8 @@
 			<li>At 10th pulse, press STOP. The heart rate is calculated and displayed.</li>
 		</ol>
 	</div>
-  	<div class="jumbotron" align="center">
-  		<h1>{{ bpm }} Bpm</h1>
-	</div>
-    <div class="span12">
-   		<button type="button" ng-show="!counting" ng-click="start()" class="btn btn-primary btn-lg btn-block">START</button>
-		<button type="button" ng-show="counting" ng-click="stop()" class="btn btn-primary btn-lg btn-block">STOP</button>
-	</div>
+  	
+    
   </div>
 </div>
 

@@ -25,11 +25,13 @@ runnerdControllers.controller('HeartrateCtrl',['$scope','$timeout',function($sco
 
     $scope.stop = function () {
     	$scope.counting = false;
-    	data.bpm = Math.floor((10/(data.value))*60);
+    	data.bpm = Math.floor((10/(data.value+1))*60);
 
         $timeout.cancel(stopwatch);
 
         stopwatch = null;
+        data.value = 0;
+        
         $scope.bpm = data.bpm;
     };
 
@@ -161,12 +163,6 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 			animate_time = animate_time + tick;
 			animate(0,runners[runner].marker,tick);
 		}	
-		
-		
-		//Total animate time
-		/*$timeout(function() {
-	              $scope.is_animate = false;
-	            }, animate_time*50)*/
 	}
 
 

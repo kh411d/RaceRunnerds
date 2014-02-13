@@ -9,4 +9,9 @@ window.onload = function () {
         }
     };
  
+	//var myScroll = new IScroll(document.getElementById('wrapper'), { mouseWheel: true});
+	//document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+
 }
+

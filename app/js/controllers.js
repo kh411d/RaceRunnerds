@@ -61,6 +61,11 @@ runnerdControllers.controller('HeartrateCtrl',['$scope','$timeout',function($sco
 
 runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
 
+var viewportWidth  = $(window).width()
+    , viewportHeight = $(window).height();
+ 
+  $('#mapcanvas').height(viewportHeight-300);
+
 //Getting TrackPoint from GPX file
     var points = [];
     var marker;
@@ -195,6 +200,11 @@ runnerdControllers.controller('SimraceCtrl',['$scope','$http','localStorageServi
 }]);
 
 runnerdControllers.controller('MeetpointCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
+
+var viewportWidth  = $(window).width()
+    , viewportHeight = $(window).height();
+ 
+  $('#mapcanvas').height(viewportHeight-300);
 
 	var markersArray = [];
 	//Getting TrackPoint from GPX file
@@ -430,6 +440,10 @@ runnerdControllers.controller('ConnectCtrl', ['$scope', 'Facebook','$timeout', f
 
 runnerdControllers.controller('RunCtrl',['$scope','$http','localStorageService','$timeout','Facebook',function($scope,$http,localStorageService,$timeout,Facebook){
    
+  var viewportWidth  = $(window).width()
+    , viewportHeight = $(window).height();
+ 
+  $('#mapcanvas').height(viewportHeight-300);
 
 	Facebook.getLoginStatus(function(response) {
       if(response.status == 'connected') {

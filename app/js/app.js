@@ -8,6 +8,7 @@ runnerdApp.run(function($rootScope,$location) {
         $rootScope.go = function ( path ) {
                           $location.path( path );
                         };
+                 
     });
 
 runnerdApp.config(['$routeProvider','FacebookProvider',function($routeProvider,FacebookProvider){
